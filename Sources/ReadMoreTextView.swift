@@ -234,7 +234,6 @@ public class ReadMoreTextView: UITextView {
             
             if newShouldTream != shouldTrim {
                 trimSelectionAction?()
-                shouldTrimWhenSelect
             }
             if shouldTrimWhenSelect {
                 shouldTrim = newShouldTream
