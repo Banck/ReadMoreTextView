@@ -87,6 +87,11 @@ public class ReadMoreTextView: UITextView {
     /**The attributed text to trim the original text. Setting this property resets `readMoreText`.*/
     public var attributedReadMoreText: NSAttributedString? {
         didSet {
+            if attributedReadMoreText != nil {
+                let attributed = NSMutableAttributedString(string: "... ", attributes: [.foregroundColor: textColor ?? .white])
+                attributed.append(attributedReadMoreText!)
+                attributedReadMoreText = attributed
+            }
             setNeedsLayout()
         }
     }
@@ -138,6 +143,12 @@ public class ReadMoreTextView: UITextView {
         }
     }
     
+    public var shouldTrimWhenSelect: Bool = true
+
+    
+    
+    public var trimSelectionAction: (() -> Void)?
+
     /**
      Force to update trimming on the next layout pass. To update right away call `layoutIfNeeded` right after.
     */
@@ -219,7 +230,15 @@ public class ReadMoreTextView: UITextView {
     
     public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let point = touches.first?.location(in: self) {
-            shouldTrim = pointIsInReadMoreOrReadLessTextRange(point: point) ?? shouldTrim
+            let newShouldTream = pointIsInReadMoreOrReadLessTextRange(point: point) ?? shouldTrim
+            
+            if newShouldTream != shouldTrim {
+                trimSelectionAction?()
+                shouldTrimWhenSelect
+            }
+            if shouldTrimWhenSelect {
+                shouldTrim = newShouldTream
+            }
         }
         super.touchesEnded(touches, with: event)
     }
